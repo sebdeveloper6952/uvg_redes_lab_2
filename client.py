@@ -89,6 +89,8 @@ seed(RANDOM_SEED)
 # b = bitarray(endian='little')
 # b.frombytes(data)
 
+HAMMING = 1
+FLETCHER = 2
 encoder = Hamming()
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
@@ -98,8 +100,18 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         msg = reduce((lambda x, y: x + y), msg)
         print(f'Sending message: {msg}')
         for rate in range(1, 100):
+            # encode and send using Hamming
             encoder.encode(data=msg)
             encoder.add_noise(rate=rate)
+            s.sendall(bytes([HAMMING]))
+            s.recv(1024)
             s.sendall(encoder.hamming_encoded.tobytes())
             s.recv(1024)
-        
+            
+            # encode and send using Fletcher
+            # fletcher_encode()
+            # fletcher_add_noise()
+            s.sendall(bytes([FLETCHER]))
+            s.recv(1024)
+            # s.sendall(fletcher_encoded)
+            s.recv(1024)
