@@ -1,7 +1,7 @@
 from fletcher import *
 
 import socket
-
+'''
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 6969        # Port to listen on (non-privileged ports are > 1023)
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -15,7 +15,15 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             if not data:
                 break
             conn.sendall(data)
+'''
+
+message = "Hola"
+
+m1 = encode(message)
+
+print("prueba", m1)
 
 
-var = "Mensaje"
-print(var, fletcher(var), checkSumToBitArray(*fletcher(var)))
+m2 = decode(m1)
+
+print(m2)

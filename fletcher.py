@@ -12,3 +12,22 @@ def fletcher(message):
 
 def checkSumToBitArray(n1, n2):
     return ( bitarray(BitArray(uint= n1, length=8)) + bitarray(BitArray(uint= n2, length=8)) )
+
+
+def encode(original_data):
+  l = len(original_data)
+  print(l)
+  encoded = bitarray()
+  encoded.frombytes(original_data.encode('ascii'))
+  return encoded + checkSumToBitArray(*fletcher(original_data))
+        
+def decode(recive_data):
+  data = bitarray()
+  reciveFletcher = bitarray()
+
+  data = recive_data[:-16] 
+  message = data.tobytes().decode('ascii')
+  
+  confirmation = recive_data[-16:] 
+
+  return (message, confirmation == checkSumToBitArray(*fletcher(message)))
