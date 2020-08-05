@@ -29,6 +29,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     with conn:
         print('Connected by', addr)
         while True:
+            errorDetection = 0
+
             # recv original message
             original_msg = conn.recv(PACKET_SIZE)
             original_msg = original_msg.decode(UTF)
@@ -51,25 +53,54 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             length_key = len(original_msg)
 
             # decode hamming
+            #Length correction
             if (len(b) % 12 != 0):
                 b = b[:-4]
+            #Flag variable
+            errorDetection = decoder.error_count
+            #Decode call
             decoder.decode(data=b)
+
+            #### [0,0,0,0]
+            # [0] original message equal to Hamming decoded
+            # [1] original message not equal to Hamming decoded
+            # [2] Error detection cont 
+            # [3] Error detection cont faild
+
             if original_msg == decoder.hamming_decoded:
                 if length_key not in hamming_stats:
                     hamming_stats[length_key] = {}
-                    hamming_stats[length_key][error_rate] = [0, 0]
+                    hamming_stats[length_key][error_rate] = [0, 0, 0, 0]
                 if error_rate not in hamming_stats[length_key]:
-                    hamming_stats[length_key][error_rate] = [0, 0]
+                    hamming_stats[length_key][error_rate] = [0, 0, 0, 0]
                 val = hamming_stats[length_key][error_rate]
                 val[0] = val[0] + 1
             else:
                 if length_key not in hamming_stats:
                     hamming_stats[length_key] = {}
-                    hamming_stats[length_key][error_rate] = [0, 0]
+                    hamming_stats[length_key][error_rate] = [0, 0, 0, 0]
                 if error_rate not in hamming_stats[length_key]:
-                    hamming_stats[length_key][error_rate] = [0, 0]
+                    hamming_stats[length_key][error_rate] = [0, 0, 0, 0]
                 val = hamming_stats[length_key][error_rate]
                 val[1] = val[1] + 1
+            #Detection error counter
+            if (errorDetection != decoder.error_count):
+                if length_key not in hamming_stats:
+                    hamming_stats[length_key] = {}
+                    hamming_stats[length_key][error_rate] = [0, 0, 0, 0]
+                if error_rate not in hamming_stats[length_key]:
+                    hamming_stats[length_key][error_rate] = [0, 0, 0, 0]
+                val = hamming_stats[length_key][error_rate]
+                val[2] = val[2] + 1
+            else:
+                if length_key not in hamming_stats:
+                    hamming_stats[length_key] = {}
+                    hamming_stats[length_key][error_rate] = [0, 0, 0, 0]
+                if error_rate not in hamming_stats[length_key]:
+                    hamming_stats[length_key][error_rate] = [0, 0, 0, 0]
+                val = hamming_stats[length_key][error_rate]
+                val[3] = val[3] + 1
+
             conn.send(b'1')
 
             # decode fletcher
@@ -77,22 +108,49 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             b = bitarray()
             b.frombytes(data)
             (fletcher_decoded, checksum_correct) = decode(b)
+
+            #### [0,0,0,0]
+            # [0] Checksum correct
+            # [1] Checksum incorrect
+            # [2] Checksum and message correct
+            # [3] Checksum and message incorrect
+
+            #Check for checksum
             if not checksum_correct:
                 if length_key not in fletcher_stats:
                     fletcher_stats[length_key] = {}
-                    fletcher_stats[length_key][error_rate] = [0, 0]
+                    fletcher_stats[length_key][error_rate] = [0, 0, 0, 0]
                 if error_rate not in fletcher_stats[length_key]:
-                    fletcher_stats[length_key][error_rate] = [0, 0]
+                    fletcher_stats[length_key][error_rate] = [0, 0, 0, 0]
                 val = fletcher_stats[length_key][error_rate]
                 val[0] = val[0] + 1
             else:
                 if length_key not in fletcher_stats:
                     fletcher_stats[length_key] = {}
-                    fletcher_stats[length_key][error_rate] = [0, 0]
+                    fletcher_stats[length_key][error_rate] = [0, 0, 0, 0]
                 if error_rate not in fletcher_stats[length_key]:
-                    fletcher_stats[length_key][error_rate] = [0, 0]
+                    fletcher_stats[length_key][error_rate] = [0, 0, 0, 0]
                 val = fletcher_stats[length_key][error_rate]
                 val[1] = val[1] + 1
+            #Check for checksum, and incorrect message
+            if (checksum_correct and (original_msg == decoder.hamming_decoded)):
+                if length_key not in fletcher_stats:
+                    fletcher_stats[length_key] = {}
+                    fletcher_stats[length_key][error_rate] = [0, 0, 0, 0]
+                if error_rate not in fletcher_stats[length_key]:
+                    fletcher_stats[length_key][error_rate] = [0, 0, 0, 0]
+                val = fletcher_stats[length_key][error_rate]
+                val[0] = val[0] + 1
+            else:
+                if length_key not in fletcher_stats:
+                    fletcher_stats[length_key] = {}
+                    fletcher_stats[length_key][error_rate] = [0, 0, 0, 0]
+                if error_rate not in fletcher_stats[length_key]:
+                    fletcher_stats[length_key][error_rate] = [0, 0, 0, 0]
+                val = fletcher_stats[length_key][error_rate]
+                val[1] = val[1] + 1
+
+
             conn.send(b'1')
             msg_count = msg_count + 1
             print(f'Decoding message #{msg_count}')
