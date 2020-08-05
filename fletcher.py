@@ -2,6 +2,9 @@ from bitarray import bitarray
 from bitstring import BitArray 
 from random import randrange
 
+ASCII = 'ascii'
+UTF = 'latin-1'
+
 def fletcher(message):
     sum1 = 0
     sum2 = 0
@@ -17,17 +20,16 @@ def checkSumToBitArray(n1, n2):
 
 def encode(original_data):
   l = len(original_data)
-  print(l)
   encoded = bitarray()
-  encoded.frombytes(original_data.encode('ascii'))
+  encoded.frombytes(original_data.encode(UTF))
   return encoded + checkSumToBitArray(*fletcher(original_data))
         
 def decode(recive_data):
   data = bitarray()
   reciveFletcher = bitarray()
 
-  data = recive_data[:-16] 
-  message = data.tobytes().decode('ascii')
+  data = recive_data[:-16]
+  message = data.tobytes().decode(UTF)
   
   confirmation = recive_data[-16:] 
 

@@ -12,6 +12,9 @@ PORT = 6969
 RANDOM_SEED = 5000
 seed(RANDOM_SEED)
 
+ASCII = 'ascii'
+UTF = 'latin-1'
+
 HAMMING = 1
 FLETCHER = 2
 encoder = Hamming()
@@ -27,26 +30,20 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 print(f'Sending message: {msg}, with error rate: {rate}')
 
                 # send original message string
-                s.sendall(msg.encode('ascii'))
+                s.sendall(msg.encode('UTF'))
                 s.recv(1024)
 
                 # send error rate
                 s.sendall(bytes([rate]))
                 s.recv(1024)
-
-                # send hamming message type
-                s.sendall(bytes([HAMMING]))
-                s.recv(1024)
+                
                 # encode and send using Hamming
                 encoder.encode(data=msg)
                 encoder.add_noise(rate=rate)
                 s.sendall(encoder.hamming_encoded.tobytes())
                 s.recv(1024)
                 
-                # send fletcher message type
-                s.sendall(bytes([FLETCHER]))
-                s.recv(1024)
                 # encode and send using Fletcher
-                s.sendall(add_noise(encode(msg), rate))
+                s.sendall(add_noise(encode(msg), rate).tobytes())
                 s.recv(1024)
     s.sendall(b'END')

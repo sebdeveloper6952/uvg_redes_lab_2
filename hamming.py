@@ -1,6 +1,9 @@
 from bitarray import bitarray
 from random import seed, choice, randrange
 
+ASCII = 'ascii'
+UTF = 'latin-1'
+
 class Hamming:
     def __init__(self, data=None, binary=None, random_seed=1):
         self.original_data = data
@@ -16,7 +19,7 @@ class Hamming:
         hamming = bitarray([False] * l * 12)
         for i in range(l):
             encoded = bitarray()
-            encoded.frombytes(self.original_data[i].encode('ascii'))
+            encoded.frombytes(self.original_data[i].encode(UTF))
             offset = i * 12
             hamming[offset + 2] = encoded[0]
             hamming[offset + 4] = encoded[1]
@@ -78,7 +81,7 @@ class Hamming:
             data.append(self.hamming_encoded[i + 11])
         
         try:
-            decoded = data.tobytes().decode('ascii')
+            decoded = data.tobytes().decode(UTF)
             self.hamming_decoded = decoded
         except:
             pass
