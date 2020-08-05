@@ -2,6 +2,7 @@ from random import seed, randrange
 import socket
 from hamming import Hamming
 from functools import reduce
+from fletcher import *
 
 # hostname servidor/receptor
 HOST = '127.0.0.1'
@@ -43,11 +44,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.recv(1024)
                 
                 # send fletcher message type
-                # s.sendall(bytes([FLETCHER]))
-                # s.recv(1024)
+                s.sendall(bytes([FLETCHER]))
+                s.recv(1024)
                 # encode and send using Fletcher
-                # fletcher_encode()
-                # fletcher_add_noise()
-                # # s.sendall(fletcher_encoded)
-                # s.recv(1024)
+                s.sendall(add_noise(encode(msg), rate))
+                s.recv(1024)
     s.sendall(b'END')

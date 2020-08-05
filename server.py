@@ -22,6 +22,7 @@ message = "Hola"
 m1 = encode(message)
 
 print("prueba", m1)
+print("prueba", add_noise(m1, 5))
 
 
 m2 = decode(m1)
