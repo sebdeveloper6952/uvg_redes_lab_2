@@ -31,3 +31,12 @@ def decode(recive_data):
   confirmation = recive_data[-16:] 
 
   return (message, confirmation == checkSumToBitArray(*fletcher(message)))
+
+def add_noise(encoded, rate=1):
+  noise_count = 0
+    for i in range(0, len(encoded):
+      p = randrange(100)
+        if p < rate:
+          noise_count = noise_count + 1
+          encoded[i] = not hamming_encoded[i]
+     
