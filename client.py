@@ -22,10 +22,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
     print('Connected to server!')
     for length in range(1, 50, 5):
-        msg = [chr(randrange(97, 123)) for x in range(length)]
-        msg = reduce((lambda x, y: x + y), msg)
         for rate in range(1, 101, 25):
             for msg_count in range(100):
+                msg = [chr(randrange(97, 123)) for x in range(length)]
+                msg = reduce((lambda x, y: x + y), msg)
                 # debug
                 print(f'Sending message: {msg}, with error rate: {rate}')
 
