@@ -140,7 +140,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 if error_rate not in fletcher_stats[length_key]:
                     fletcher_stats[length_key][error_rate] = [0, 0, 0, 0]
                 val = fletcher_stats[length_key][error_rate]
-                val[0] = val[0] + 1
+                val[2] = val[2] + 1
             else:
                 if length_key not in fletcher_stats:
                     fletcher_stats[length_key] = {}
@@ -148,7 +148,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 if error_rate not in fletcher_stats[length_key]:
                     fletcher_stats[length_key][error_rate] = [0, 0, 0, 0]
                 val = fletcher_stats[length_key][error_rate]
-                val[1] = val[1] + 1
+                val[3] = val[3] + 1
 
 
             conn.send(b'1')
