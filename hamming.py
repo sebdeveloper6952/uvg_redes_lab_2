@@ -9,7 +9,9 @@ class Hamming:
         self.noise_count = 0
         seed(random_seed)
 
-    def encode(self):
+    def encode(self, data=None):
+        if data:
+            self.original_data = data
         l = len(self.original_data)
         hamming = bitarray([False] * l * 12)
         for i in range(l):
@@ -46,7 +48,9 @@ class Hamming:
 
         return (old_parity_bits, new_parity_bits)
     
-    def decode(self, correct=True):
+    def decode(self, data=None, correct=True):
+        if data:
+            self.hamming_encoded = data
         if correct:
             self.error_count = 0
 
@@ -73,13 +77,21 @@ class Hamming:
             data.append(self.hamming_encoded[i + 10])
             data.append(self.hamming_encoded[i + 11])
         
-        self.hamming_decoded = data.tobytes().decode('ascii')
+        try:
+            decoded = data.tobytes().decode('ascii')
+            self.hamming_decoded = decoded
+        except:
+            pass
     
     def add_noise(self, rate=1):
-        options = [2, 4, 5, 6, 7, 8, 9, 10, 11]
+        self.noise_count = 0
+        options = [10, 11]
         for i in range(0, len(self.hamming_encoded), 12):
             p = randrange(100)
             if p < rate:
                 self.noise_count = self.noise_count + 1
-                c = choice(options)
-                self.hamming_encoded[i + c] = not self.hamming_encoded[i + c]
+                self.hamming_encoded[i + 11] = not self.hamming_encoded[i + 11]
+            p = randrange(100)
+            if p < rate:
+                self.noise_count = self.noise_count + 1
+                self.hamming_encoded[i + 10] = not self.hamming_encoded[i + 10]
