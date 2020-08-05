@@ -175,23 +175,31 @@ for length in hamming_stats.keys():
     labels = hamming_stats[length].keys()
     correct = []
     wrong = []
+    correct2 = []
+    wrong2 = []
     for rate in hamming_stats[length]:
         val = hamming_stats[length][rate]
         correct.append(val[0])
         wrong.append(val[1])
+        correct2.append(val[2])
+        wrong2.append(val[3])
     x = np.arange(len(labels))
     width = 0.35
     fig, ax = plt.subplots()
     rects1 = ax.bar(x - width / 2, correct, width, label='Corregido')
     rects2 = ax.bar(x + width / 2, wrong, width, label='No Corregido')
+    rects3 = ax.bar(x - width / 2, correct2, width, label='Errores detectados')
+    rects4 = ax.bar(x + width / 2, wrong2, width, label='Errores sin detectar')
     ax.set_ylabel('Cantidad')
-    ax.set_xlabel('Probabilidad de Error')
+    ax.set_xlabel('Cantidad de Errores de por cada 100 Bits')
     ax.set_title(f'Hamming - Cantidad de Caracteres en Mensaje: {length}')
     ax.set_xticks(x)
     ax.set_xticklabels(labels)
     ax.legend()
     autolabel(rects1)
     autolabel(rects2)
+    autolabel(rects3)
+    autolabel(rects4)
     fig.tight_layout()
     fig.savefig(f'./img/hamming_{length}.png')
 
@@ -199,15 +207,21 @@ for length in fletcher_stats.keys():
     labels = fletcher_stats[length].keys()
     correct = []
     wrong = []
+    correct2 = []
+    wrong2 = []
     for rate in fletcher_stats[length]:
         val = fletcher_stats[length][rate]
         correct.append(val[0])
         wrong.append(val[1])
+        correct2.append(val[2])
+        wrong2.append(val[3])
     x = np.arange(len(labels))
     width = 0.35
     fig, ax = plt.subplots()
     rects1 = ax.bar(x - width / 2, correct, width, label='Error Detectado')
-    rects2 = ax.bar(x + width / 2, wrong, width, label='Mensajes sin Error')
+    rects2 = ax.bar(x + width / 2, wrong, width, label='Error sin detectar')
+    rects3 = ax.bar(x - width / 2, correct2, width, label='Hay error y se detecto')
+    rects4 = ax.bar(x + width / 2, wrong2, width, label='Si hay error y no se detecto')
     ax.set_ylabel('Cantidad')
     ax.set_xlabel('Cantidad de Errores de por cada 100 Bits')
     ax.set_title(f'Fletcher - Cantidad de Caracteres en Mensaje: {length}')
@@ -216,6 +230,8 @@ for length in fletcher_stats.keys():
     ax.legend()
     autolabel(rects1)
     autolabel(rects2)
+    autolabel(rects3)
+    autolabel(rects4)
     fig.tight_layout()
     fig.savefig(f'./img/fletcher_{length}.png')
 
